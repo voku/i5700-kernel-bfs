@@ -74,6 +74,12 @@
 #include <linux/delay.h> // yoohyuk 2009-03-16 just test codes.
 #include <mach/sec_headset.h>
 
+#if defined(CONFIG_USB_OHCI_HCD)
+#include <linux/usb/ch9.h>
+#endif
+
+void usb_host_clk_en(int usb_host_clksrc);
+
 struct class *sec_class;
 EXPORT_SYMBOL(sec_class);
 
@@ -378,6 +384,7 @@ static struct platform_device *spica_devices[] __initdata = {
 #endif
 	&s3c_device_lcd,
 	&s3c_device_usbgadget,
+	&s3c_device_usb,
 	&s3c_device_camif,
 	&s3c_device_mfc,
 	&s3c_device_g3d,
@@ -631,6 +638,7 @@ static void spica_switch_init(void)
 
 static void __init spica_machine_init(void)
 {
+
 	spica_init_gpio();
 
 	s3c_i2c0_set_platdata(NULL);
@@ -651,6 +659,9 @@ static void __init spica_machine_init(void)
 	
 	s3c6410_pm_init();
 
+#ifdef CONFIG_USB_OHCI_HCD
+	usb_host_clk_en(0);
+#endif
 	spica_set_qos();
 
 	pm_power_off = spica_pm_power_off;
@@ -660,6 +671,7 @@ static void __init spica_machine_init(void)
 	spica_switch_init();
 
 	ftm_enable_usb_sw = spica_ftm_enable_usb_sw;
+
 }
 
 MACHINE_START(SPICA, "SPICA")
@@ -1485,3 +1497,39 @@ void s3c_config_wakeup_source(void)
 }
 EXPORT_SYMBOL(s3c_config_wakeup_source);
 
+/*************************************************************************************
+* USB HOST
+**************************************************************************************/
+#ifdef CONFIG_USB_OHCI_HCD
+void usb_host_clk_en(int usb_host_clksrc)
+{
+    printk("Usb Host CLK enable! 2009 by Rockie \n");
+    switch (usb_host_clksrc)
+    {
+	case 0: // epll clk
+	    writel((readl(S3C_CLK_SRC)& ~S3C_CLKSRC_UHOST_MASK) | S3C_CLKSRC_EPLL_CLKSEL | S3C_CLKSRC_UHOST_EPLL, S3C_CLK_SRC);
+	    printk(KERN_INFO "S3C_CLK_SRC: \n");
+	    // USB host colock divider ratio is 2 /
+	    //writel((readl(S3C_CLK_DIV1)& ~S3C_CLKDIVN_UHOST_MASK) | S3C_CLKDIV1_USBDIV2, S3C_CLK_DIV1);
+	    *(volatile unsigned long*) S3C_CLK_DIV1 |= (0<<20);
+	    break;
+	case 1: // oscillator 48M clk /
+	    writel(readl(S3C_CLK_SRC)& ~S3C_CLKSRC_UHOST_MASK, S3C_CLK_SRC);
+	    //otg_phy_init(otg_phy_clk);
+
+	    // USB host colock divider ratio is 1 /
+	    //writel(readl(S3C_CLK_DIV1)& ~S3C_CLKDIVN_UHOST_MASK, S3C_CLK_DIV1);
+	    *(volatile unsigned long*) S3C_CLK_DIV1 |= (0<<20);
+	    break;
+	default:
+	    printk(KERN_INFO "Unknown USB Host Clock Source\n");
+	    BUG();
+	    break;
+    }
+
+    writel(readl(S3C_HCLK_GATE)|S3C_CLKCON_HCLK_UHOST|S3C_CLKCON_HCLK_SECUR, S3C_HCLK_GATE);
+    writel(readl(S3C_SCLK_GATE)|S3C_CLKCON_SCLK_UHOST, S3C_SCLK_GATE);
+
+}
+EXPORT_SYMBOL(usb_host_clk_en);
+#endif
