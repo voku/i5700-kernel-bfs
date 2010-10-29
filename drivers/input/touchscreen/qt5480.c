@@ -2036,13 +2036,22 @@ static void qt5480_charger_workaround(struct work_struct *aWork)
     ret = qt5480_i2c_write(REG_MEDIAN_FILTER_LENGTH, 3);
     DO_IF_TRUE(ret < 0, PRINT_MSG("write Median Filter Length Register failed(%d)!\n", ret));
     PRINT_MSG("Charger connected, changing MEDIAN_FILTER_LENGTH\n");
+
+//    ret = qt5480_i2c_write(REG_IIR_FILTER_CONTROL, 4);
+//    DO_IF_TRUE(ret < 0, PRINT_MSG("write IIR Filter Control Register failed(%d)!\n", ret));
+//    PRINT_MSG("Charger connected, changing IIR_FILTER_CONTROL\n");
+
   }
 
   if(charging == 0 && previous != charging)
   {
     ret = qt5480_i2c_write(REG_MEDIAN_FILTER_LENGTH, g_qt5480_setup[REG_MEDIAN_FILTER_LENGTH - 512]);
-    DO_IF_TRUE(ret < 0, PRINT_MSG("write LP Mode Register failed(%d)!\n", ret));
+    DO_IF_TRUE(ret < 0, PRINT_MSG("write Median Filter Length Register failed(%d)!\n", ret));
     PRINT_MSG("Charger disconnected, reverting MEDIAN_FILTER_LENGTH\n");
+
+//    ret = qt5480_i2c_write(REG_IIR_FILTER_CONTROL, g_qt5480_setup[REG_IIR_FILTER_CONTROL - 512]);
+//    DO_IF_TRUE(ret < 0, PRINT_MSG("write IIR Filter Control Register failed(%d)!\n", ret));
+//    PRINT_MSG("Charger disconnected, reverting IIR_FILTER_CONTROL\n");
   }
 
   previous = charging;
@@ -2718,19 +2727,22 @@ static ssize_t gpio_store(
 
 // print QT setup status
 static ssize_t setup_show(struct device *aDevice, struct device_attribute *aAttribute, char *aBuf)
-    {
-    int i;
-    PRINT_MSG("Setup Status\n");
-    for(i = 0; i < sizeof (g_qt5480_setup); i++)
-        {
-        printk("%04d\t", g_qt5480_setup[i]);
-        if(!((i+1)%4)) printk("\n");
-        }
-
-    printk("\n");
-    return sprintf(aBuf, "%s\n", aBuf);
-
-    }
+{
+  int i;
+  int len = 0;
+  int elen;
+  for(i = 0; i < sizeof (g_qt5480_setup); i++)
+  {
+   	if(i % 8 == 0 && i != 0) len += sprintf(aBuf+len, "\n");
+    elen = sprintf(aBuf+len, "%d", g_qt5480_setup[i]);
+    len += elen;
+    if(elen <= 1) len += sprintf(aBuf+len, " ");
+    if(elen <= 2) len += sprintf(aBuf+len, " ");
+    if(elen <= 3) len += sprintf(aBuf+len, " ");
+  }
+  len += sprintf(aBuf+len, "\n");
+  return len;
+}
 
 // Do nothing
 static ssize_t setup_store(struct device *aDevice, struct device_attribute *aAttribute, const char *aBuf, size_t aSize)
@@ -2809,7 +2821,7 @@ int __init qt5480_init(void)
 
     ENTER_FUNC;
 
-    printk("GT-i5700 (Atmel AT42QT5480) touchscreen driver\n");
+    printk("GT-i5700 (Atmel AT42QT5480) touchscreen driver (v2.4)\n");
     printk(" (C) 2009 Samsung Electronics Co. Ltd.\n");
     printk(" (C) 2010 Lambertus Gorter (multitouch)\n");
 
