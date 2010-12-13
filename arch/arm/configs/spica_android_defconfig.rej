@@ -1,0 +1,30 @@
+--- arch/arm/configs/spica_android_defconfig
++++ arch/arm/configs/spica_android_defconfig
+@@ -1,7 +1,7 @@
+ #
+ # Automatically generated make config: don't edit
+-# Linux kernel version: 2.6.29
+-# Mon Nov  8 09:20:34 2010
++# Linux kernel version: 2.6.29.6
++# Tue Dec  7 09:12:38 2010
+ #
+ CONFIG_ARM=y
+ CONFIG_SYS_SUPPORTS_APM_EMULATION=y
+@@ -64,7 +67,7 @@
+ # CONFIG_RELAY is not set
+ # CONFIG_NAMESPACES is not set
+ CONFIG_BLK_DEV_INITRD=y
+-CONFIG_INITRAMFS_SOURCE="/usr/src/kernel/i5700-leshak-initramfs-froyo/initrd.arm.initramfs_list"
++CONFIG_INITRAMFS_SOURCE="/usr/src/kernel/i5700-leshak-initramfs-froyo-2.6.29.6/initrd.arm.initramfs_list"
+ CONFIG_INITRAMFS_ROOT_UID=0
+ CONFIG_INITRAMFS_ROOT_GID=0
+ # CONFIG_CC_OPTIMIZE_FOR_SIZE is not set
+@@ -1165,7 +1171,7 @@
+ CONFIG_HID_COMPAT=y
+ CONFIG_USB_SUPPORT=y
+ CONFIG_USB_ARCH_HAS_HCD=y
+-CONFIG_USB_ARCH_HAS_OHCI=y
++# CONFIG_USB_ARCH_HAS_OHCI is not set
+ # CONFIG_USB_ARCH_HAS_EHCI is not set
+ # CONFIG_USB is not set
+ # CONFIG_USB_OTG_WHITELIST is not set
