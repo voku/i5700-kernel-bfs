@@ -1480,9 +1480,8 @@ void wake_up_new_task(struct task_struct *p, unsigned long clone_flags)
 	struct rq *rq;
 
 	rq = task_grq_lock(p, &flags); ;
-	p->state = TASK_RUNNING;
 	parent = p->parent;
-	/* Unnecessary but small chance that the parent changed CPU */
+	BUG_ON(p->state != TASK_RUNNING);
 	set_task_cpu(p, task_cpu(parent));
 	activate_task(p, rq);
 	if (!(clone_flags & CLONE_VM) && rq->curr == parent &&

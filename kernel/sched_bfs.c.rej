@@ -1,0 +1,14 @@
+--- kernel/sched_bfs.c	2010-08-29 16:51:09.341868703 +1000
++++ kernel/sched_bfs.c	2010-08-29 16:55:51.085001341 +1000
+@@ -1484,9 +1559,9 @@
+ 	struct rq *rq;
+ 
+ 	rq = task_grq_lock(p, &flags); ;
++	p->state = TASK_RUNNING;
+ 	parent = p->parent;
+-	BUG_ON(p->state != TASK_RUNNING);
+-	/* Unnecessary but small chance that the parent changed cpus */
++	/* Unnecessary but small chance that the parent changed CPU */
+ 	set_task_cpu(p, task_cpu(parent));
+ 	activate_task(p, rq);
+ 	trace_sched_wakeup_new(rq, p, 1);
