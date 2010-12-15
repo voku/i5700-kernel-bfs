@@ -18,10 +18,11 @@
  */
 #define BATT_CAL		2447	/* 3.60V */
 
-#define BATT_MAXIMUM		500	/* 4.176V defalt:: 406*/
-#define BATT_FULL		480	/* 4.10V, default: 353   */
+#define BATT_MAXIMUM		500	/* 4.176V default:: 406*/
+#define BATT_FULL		495	/* 4.10V, default: 353   */
+#define BATT_PRE_FULL_HIGH	450
 #define BATT_PRE_FULL		420
-#define BATT_SAFE_RECHARGE 505	/* 4.10V default: 353*/
+#define BATT_SAFE_RECHARGE 496	/* 4.10V default: 353*/
 #define BATT_ALMOST_FULL	350 /* 3.8641V  default: 188*/ //322	/* 4.066V */
 #define BATT_HIGH		280 /* 3.7554V default: 112 */ 		//221	/* 3.919V */
 #define BATT_MED		250 /* 3.6907V default: 66 */ 		//146	/* 3.811V */
