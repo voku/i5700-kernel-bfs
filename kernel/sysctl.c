@@ -104,6 +104,7 @@ static int one_hundred = 100;
 #ifdef CONFIG_SCHED_BFS
 extern int rr_interval;
 extern int sched_iso_cpu;
+extern int latency_bias;
 static int one_thousand = 1000;
 #endif
 
@@ -798,6 +799,15 @@ static struct ctl_table kern_table[] = {
 		.ctl_name	= CTL_UNNUMBERED,
 		.procname	= "iso_cpu",
 		.data		= &sched_iso_cpu,
+		.maxlen		= sizeof (int),
+		.mode		= 0644,
+		.proc_handler	= &proc_dointvec_minmax,
+		.extra1		= &zero,
+		.extra2		= &one_hundred,
+	},
+	{
+		.procname	= "latency_bias",
+		.data		= &latency_bias,
 		.maxlen		= sizeof (int),
 		.mode		= 0644,
 		.proc_handler	= &proc_dointvec_minmax,

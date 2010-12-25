@@ -156,6 +156,14 @@ int rr_interval __read_mostly = 6;
 int sched_iso_cpu __read_mostly = 70;
 
 /*
+ * latency_bias is used to determine whether we should sacrifice throughput
+ * as load increases to try and keep latencies bound to rr_interval. It does
+ * not change the fairness, so heavy CPU users will still run slow (slower
+ * since throughput decreases dramatically the higher this is set to).
+ */
+int latency_bias __read_mostly = 2;
+
+/*
  * The relative length of deadline for each priority(nice) level.
  */
 static int prio_ratios[PRIO_RANGE] __read_mostly;
@@ -2041,6 +2049,23 @@ update_cpu_clock(struct rq *rq, struct task_struct *p, int tick)
 		s64 time_diff = rq->clock - rq->rq_last_ran;
 
 		niffy_diff(&time_diff, 1);
+		/*
+		 * If we are overloaded, then shorten the effective timeslices
+		 * to ensure latencies are kept as small as is possible by
+		 * making them expire at a rate proportional to load/CPUs. Use
+		 * latency_bias to determine the upper limit for how much to
+		 * shorten the effective timeslice.
+		 */
+		if (latency_bias) {
+			int nr = nr_running(), nol = num_online_cpus();
+
+			if (nr > nol) {
+				time_diff /= nol;
+				if (nr > latency_bias * nol)
+					nr = latency_bias * nol;
+				time_diff *= nr;
+			}
+		}
 		rq->rq_time_slice -= NS_TO_US(time_diff);
 	}
 	rq->rq_last_ran = rq->timekeep_clock = rq->clock;
