@@ -1,0 +1,16 @@
+--- kernel/sched_bfs.c	2010-08-29 16:51:09.341868703 +1000
++++ kernel/sched_bfs.c	2010-08-29 16:55:51.085001341 +1000
+@@ -4349,8 +4416,11 @@
+ 
+ 	if (task_running(p)) {
+ 		/* Task is running on the wrong cpu now, reschedule it. */
+-		set_tsk_need_resched(p);
+-		running_wrong = 1;
++		if (rq == this_rq()) {
++			set_tsk_need_resched(p);
++			running_wrong = 1;
++		} else
++			resched_task(p);
+ 	} else
+ 		set_task_cpu(p, cpumask_any_and(cpu_online_mask, new_mask));
+ 

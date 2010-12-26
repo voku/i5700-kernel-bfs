@@ -104,7 +104,7 @@ static int one_hundred = 100;
 #ifdef CONFIG_SCHED_BFS
 extern int rr_interval;
 extern int sched_iso_cpu;
-static int one_thousand = 1000;
+static int five_thousand = 5000;
 #endif
 
 /* this is needed for the proc_doulongvec_minmax of vm_dirty_bytes */
@@ -792,7 +792,7 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= &proc_dointvec_minmax,
 		.strategy	= &sysctl_intvec,
 		.extra1		= &one,
-		.extra2		= &one_thousand,
+		.extra2		= &five_thousand,
 	},
 	{
 		.ctl_name	= CTL_UNNUMBERED,
@@ -801,6 +801,7 @@ static struct ctl_table kern_table[] = {
 		.maxlen		= sizeof (int),
 		.mode		= 0644,
 		.proc_handler	= &proc_dointvec_minmax,
+		.strategy	= &sysctl_intvec,
 		.extra1		= &zero,
 		.extra2		= &one_hundred,
 	},
