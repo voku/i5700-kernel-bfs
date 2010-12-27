@@ -143,6 +143,7 @@ extern int nr_processes(void);
 extern unsigned long nr_running(void);
 extern unsigned long nr_uninterruptible(void);
 extern unsigned long nr_iowait(void);
+extern int above_background_load(void);
 extern void calc_global_load(void);
 
 struct seq_file;
