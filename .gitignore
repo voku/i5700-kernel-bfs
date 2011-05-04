@@ -28,6 +28,7 @@ modules.builtin
 *.gz
 *.bz2
 *.lzma
+*.gzip
 *.patch
 *.gcno
 
@@ -71,7 +72,6 @@ GSYMS
 GTAGS
 
 *.orig
-*.rej
 *~
 \#*#
 

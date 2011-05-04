@@ -153,10 +153,6 @@ void android_usb_set_connected(int connected)
 	}
 }
 
-#if ADB_ENABLE_AT_BOOT
-static void enable_adb(struct android_dev *dev, int enable);
-#endif
-
 static int __init android_bind_config(struct usb_configuration *c)
 {
 	struct android_dev *dev = _android_dev;
@@ -184,6 +180,9 @@ static int __init android_bind_config(struct usb_configuration *c)
 #define	ANDROID_DEBUG_CONFIG_STRING "UMS + ADB (Debugging mode)"
 #define	ANDROID_NO_DEBUG_CONFIG_STRING "UMS Only (Not debugging mode)"
 
+static int android_setup_config(struct usb_configuration *c,
+		const struct usb_ctrlrequest *ctrl);
+
 static struct usb_configuration android_config  = {
 	.label		= ANDROID_NO_DEBUG_CONFIG_STRING,
 	.bind		= android_bind_config,
@@ -191,6 +190,23 @@ static struct usb_configuration android_config  = {
 	.bmAttributes	= USB_CONFIG_ATT_ONE | USB_CONFIG_ATT_SELFPOWER,
 	.bMaxPower	= 0x30, /*  x2 = 160ma */
 };
+
+static int android_setup_config(struct usb_configuration *c,
+		const struct usb_ctrlrequest *ctrl)
+{
+	int i;
+	int ret = -EOPNOTSUPP;
+
+	for (i = 0; i < android_config_driver.next_interface_id; i++) {
+		if (android_config_driver.interface[i]->setup) {
+			ret = android_config_driver.interface[i]->setup(
+				android_config_driver.interface[i], ctrl);
+			if (ret >= 0)
+				return ret;
+		}
+	}
+	return ret;
+}
 
 static int __init android_bind(struct usb_composite_dev *cdev)
 {
@@ -225,6 +241,9 @@ static int __init android_bind(struct usb_composite_dev *cdev)
 	get_usb_serial(usb_serial_number);
 	strings_dev[STRING_SERIAL_IDX].id = id;
 
+	if (gadget->ops->wakeup)
+		android_config_driver.bmAttributes |= USB_CONFIG_ATT_WAKEUP;
+
 	if( (usb_serial_number[0] + 
 		 usb_serial_number[1] + 
 		 usb_serial_number[2]) != 0 )
@@ -254,7 +273,7 @@ static int __init android_bind(struct usb_composite_dev *cdev)
 	
 #if USBCV_CH9_REMOTE_WAKE_UP_TEST 
 	if (gadget->ops->wakeup)
-		android_config.bmAttributes |= USB_CONFIG_ATT_WAKEUP;
+		android_config_driver.bmAttributes |= USB_CONFIG_ATT_WAKEUP;
 #endif
 
 	/* register our configuration */

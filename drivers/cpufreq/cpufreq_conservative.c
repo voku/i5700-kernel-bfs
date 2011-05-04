@@ -35,7 +35,7 @@
  */
 
 #define DEF_FREQUENCY_UP_THRESHOLD		(70)
-#define DEF_FREQUENCY_DOWN_THRESHOLD		(40)
+#define DEF_FREQUENCY_DOWN_THRESHOLD	(40)
 #ifdef CONFIG_CPU_S3C6410
 #define DEF_SAMPLING_FREQ_STEP	20
 extern int dvfs_change_quick;
@@ -61,7 +61,7 @@ static unsigned int def_sampling_rate;
 	(MIN_SAMPLING_RATE_RATIO * jiffies_to_usecs(CONFIG_CPU_FREQ_MIN_TICKS))
 #define MIN_SAMPLING_RATE			\
 			(def_sampling_rate / MIN_SAMPLING_RATE_RATIO)
-#define MAX_SAMPLING_RATE			(500 * def_sampling_rate)
+#define MAX_SAMPLING_RATE				(500 * def_sampling_rate)
 #define DEF_SAMPLING_DOWN_FACTOR		(1)
 #define MAX_SAMPLING_DOWN_FACTOR		(10)
 #define TRANSITION_LATENCY_LIMIT		(10 * 1000 * 1000)

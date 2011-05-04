@@ -127,8 +127,8 @@ static int print_lock_stat(char *buf, int len, struct wake_lock *lock)
 static int wakelocks_read_proc(char *page, char **start, off_t off,
 			       int count, int *eof, void *data)
 {
-	unsigned long irqflags;
 	struct wake_lock *lock;
+	unsigned long irqflags;
 	int len = 0;
 	int type;
 

@@ -686,7 +686,7 @@ int path_enable(struct snd_soc_codec *codec, int mode)
 
 		case MM_AUDIO_FMRADIO_HP :
 
-			codec->write(codec, 0x53, 0x2e);	// PMPCM+PMSRB power up, clk: SYNCB
+			codec->write(codec, 0x53, 0x26);	// PMPCM+PMSRB power up, clk: SYNCB
 			codec->write(codec, 0x59, 0x54);	// BIVOL -> SRC-B, SRC-B=> SDTO
 			codec->write(codec, 0x15, 0x50);	// SRC-B -> pre D/A
 			mdelay(1);
